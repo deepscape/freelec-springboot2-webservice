@@ -26,6 +26,8 @@ public class OAuth2Attributes {
 
     // OAuth2User 에서 반환하는 사용자 정보는 Map 이기 때문에, 아래와 같이 ofGoogle 을 통해  값 하나하나를 변환해야 한다.
     public static OAuth2Attributes of(String registrationId, String userNameAttributeName, Map<String, Object> attributes) {
+        if ("naver".equals(registrationId)) { return ofNaver("id", attributes); }
+
         return ofGoogle(userNameAttributeName, attributes);
     }
 
@@ -38,6 +40,19 @@ public class OAuth2Attributes {
                 .nameAttributesKey(userNameAttributeName)
                 .build();
     }
+
+    private static OAuth2Attributes ofNaver(String userNameAttributeName, Map<String, Object> attributes) {
+        Map<String, Object> response = (Map<String, Object>)attributes.get("response");
+
+        return OAuth2Attributes.builder()
+                .name((String) response.get("name"))
+                .email((String) response.get("email"))
+                .picture((String) response.get("profileImage"))
+                .attributes(response)
+                .nameAttributesKey(userNameAttributeName)
+                .build();
+    }
+
 
     /*
         User Entity 생성
